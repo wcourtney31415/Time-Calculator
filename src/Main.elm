@@ -21,6 +21,14 @@ type alias Model =
     { hour1 : String
     , minute1 : String
     , amPm1 : AmPm
+    , time1 : Time
+    }
+
+
+type alias Time =
+    { hour : String
+    , minute : String
+    , amPm : AmPm
     }
 
 
@@ -29,11 +37,13 @@ init =
     { hour1 = ""
     , minute1 = ""
     , amPm1 = Am
+    , time1 = { hour = "", minute = "", amPm = Am }
     }
 
 
 type Msg
     = UpdateModel Model
+    | UpdateTime Time
 
 
 type HourOrMinute
@@ -52,16 +62,19 @@ update msg model =
         UpdateModel myModel ->
             myModel
 
+        UpdateTime newTime ->
+            { model | time1 = newTime }
 
-timeTextBox model hourOrMinute =
+
+timeTextBox time hourOrMinute =
     let
         labels =
             case hourOrMinute of
                 Hour ->
-                    ( "Hour", "0-12", model.hour1 )
+                    ( "Hour", "0-12", time.hour )
 
                 Minute ->
-                    ( "Minute", "0-60", model.minute1 )
+                    ( "Minute", "0-60", time.minute )
 
         ( label, placeholder, val ) =
             labels
@@ -70,11 +83,12 @@ timeTextBox model hourOrMinute =
         [ width <| px 100 ]
         { text = val
         , placeholder = Just (Input.placeholder [] (text placeholder))
-        , onChange = go model hourOrMinute
+        , onChange = go time hourOrMinute
         , label = Input.labelAbove [ Font.size 14 ] (text label)
         }
 
 
+go : Time -> HourOrMinute -> String -> Msg
 go model hourOrMinute newKey =
     let
         upperBound =
@@ -88,10 +102,10 @@ go model hourOrMinute newKey =
         newModel =
             case hourOrMinute of
                 Hour ->
-                    { model | hour1 = new }
+                    { model | hour = new }
 
                 Minute ->
-                    { model | minute1 = new }
+                    { model | minute = new }
 
         newKeyAsNum =
             Maybe.withDefault -1 (String.toInt newKey)
@@ -99,10 +113,10 @@ go model hourOrMinute newKey =
         previousVal =
             case hourOrMinute of
                 Hour ->
-                    model.hour1
+                    model.hour
 
                 Minute ->
-                    model.minute1
+                    model.minute
 
         new =
             if newKey == "" then
@@ -117,13 +131,17 @@ go model hourOrMinute newKey =
             else
                 previousVal
     in
-    UpdateModel newModel
+    UpdateTime newModel
 
 
 timeEntry model =
+    let
+        myTime =
+            model.time1
+    in
     Element.row [ spacing 10 ]
-        [ timeTextBox model Hour
-        , timeTextBox model Minute
+        [ timeTextBox model.time1 Hour
+        , timeTextBox model.time1 Minute
         , Input.button
             [ alignBottom
             , height <| px 20
@@ -132,33 +150,34 @@ timeEntry model =
             , padding 20
             ]
             { onPress =
+                let
+                    modification =
+                        { myTime
+                            | amPm = iif ( myTime.amPm == Am, Pm, Am )
+                        }
+                in
                 Maybe.Just <|
                     UpdateModel
                         { model
-                            | amPm1 =
-                                if model.amPm1 == Am then
-                                    Pm
-
-                                else
-                                    Am
+                            | time1 = modification
                         }
             , label =
                 Element.el [] <|
                     text <|
-                        if model.amPm1 == Am then
-                            "AM"
-
-                        else
-                            "PM"
+                        iif ( model.time1.amPm == Am, "AM", "PM" )
             }
         ]
 
 
+iif ( eval, isTrue, isFalse ) =
+    if eval then
+        isTrue
+
+    else
+        isFalse
+
+
 view model =
-    let
-        red =
-            rgb 1 0 0
-    in
     Element.layout
         [ padding 25 ]
     <|
