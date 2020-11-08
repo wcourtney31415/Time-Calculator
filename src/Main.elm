@@ -29,15 +29,20 @@ green =
     rgb 0 1 0
 
 
+black =
+    rgb 0 0 0
+
+
+grey x =
+    rgb x x x
+
+
 findWith col =
     Background.color col
 
 
 type alias Model =
-    { hour1 : String
-    , minute1 : String
-    , amPm1 : AmPm
-    , time1 : Time
+    { time1 : Time
     }
 
 
@@ -50,10 +55,11 @@ type alias Time =
 
 init : Model
 init =
-    { hour1 = ""
-    , minute1 = ""
-    , amPm1 = Am
-    , time1 = { hour = "", minute = "", amPm = Am }
+    { time1 =
+        { hour = ""
+        , minute = ""
+        , amPm = Am
+        }
     }
 
 
@@ -87,7 +93,7 @@ timeTextBox time hourOrMinute =
         labels =
             case hourOrMinute of
                 Hour ->
-                    ( "Hour", "0-12", time.hour )
+                    ( "Hour", "1-12", time.hour )
 
                 Minute ->
                     ( "Minute", "0-60", time.minute )
@@ -98,8 +104,8 @@ timeTextBox time hourOrMinute =
     Input.text
         [ width <| px 100 ]
         { text = val
-        , placeholder = Just (Input.placeholder [] (text placeholder))
-        , onChange = go time hourOrMinute
+        , placeholder = Just (Input.placeholder [ Background.color <| grey 0.05 ] (text placeholder))
+        , onChange = updateTime time hourOrMinute
         , label =
             Input.labelAbove
                 [ Font.size 14
@@ -109,8 +115,8 @@ timeTextBox time hourOrMinute =
         }
 
 
-go : Time -> HourOrMinute -> String -> Msg
-go model hourOrMinute newKey =
+updateTime : Time -> HourOrMinute -> String -> Msg
+updateTime model hourOrMinute newKey =
     let
         upperBound =
             case hourOrMinute of
@@ -164,6 +170,8 @@ timeEntry model =
         [ spacing 10
         , padding 20
         , Border.rounded 10
+
+        -- , Border.innerGlow red 4
         , Background.color <| rgb 0.3 0.3 0.3
         ]
         [ timeTextBox model.time1 Hour
@@ -217,8 +225,20 @@ view model =
         Element.column
             [ width fill
             , height fill
-            , spacing 30
             ]
-            [ timeEntry model
-            , timeEntry model
+            [ Element.column
+                [ spacing 20
+                , Background.color <| rgb 0.1 0.1 0.1
+                , Border.rounded 10
+                , Border.shadow
+                    { offset = ( 5, 5 )
+                    , size = 2
+                    , blur = 4
+                    , color = black
+                    }
+                , padding 20
+                ]
+                [ timeEntry model
+                , timeEntry model
+                ]
             ]
