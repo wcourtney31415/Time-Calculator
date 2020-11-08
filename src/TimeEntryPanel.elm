@@ -12,6 +12,24 @@ import MessagesModels exposing (..)
 import UsefulFunctions exposing (..)
 
 
+timeEntryPanel model =
+    Element.column
+        [ spacing 20
+        , Background.color <| rgb 0.1 0.1 0.1
+        , Border.rounded 10
+        , Border.shadow
+            { offset = ( 5, 5 )
+            , size = 2
+            , blur = 4
+            , color = black
+            }
+        , padding 20
+        ]
+        [ timeEntry model
+        , timeEntry model
+        ]
+
+
 timeEntry model =
     let
         myTime =
@@ -23,7 +41,7 @@ timeEntry model =
         , Border.rounded 10
 
         -- , Border.innerGlow red 4
-        , Background.color <| rgb 0.3 0.3 0.3
+        , Background.color <| grey 0.3
         ]
         [ timeTextBox model.time1 Hour
         , timeTextBox model.time1 Minute
@@ -31,7 +49,7 @@ timeEntry model =
             [ alignBottom
             , height <| px 20
             , Border.rounded 10
-            , Background.color <| rgb 0.8 0.8 0.8
+            , Background.color <| grey 0.8
             , padding 20
             ]
             { onPress =
@@ -61,24 +79,6 @@ timeEntry model =
         ]
 
 
-timeEntryPanel model =
-    Element.column
-        [ spacing 20
-        , Background.color <| rgb 0.1 0.1 0.1
-        , Border.rounded 10
-        , Border.shadow
-            { offset = ( 5, 5 )
-            , size = 2
-            , blur = 4
-            , color = black
-            }
-        , padding 20
-        ]
-        [ timeEntry model
-        , timeEntry model
-        ]
-
-
 timeTextBox time hourOrMinute =
     let
         labels =
@@ -93,9 +93,18 @@ timeTextBox time hourOrMinute =
             labels
     in
     Input.text
-        [ width <| px 100 ]
+        [ width <| px 100
+        , Border.rounded 5
+        ]
         { text = val
-        , placeholder = Just (Input.placeholder [ Background.color <| grey 0.05 ] (text placeholder))
+        , placeholder =
+            Just
+                (Input.placeholder
+                    [ Background.color <| grey 0.05
+                    , Border.rounded 5
+                    ]
+                    (text placeholder)
+                )
         , onChange = updateTime time hourOrMinute
         , label =
             Input.labelAbove
