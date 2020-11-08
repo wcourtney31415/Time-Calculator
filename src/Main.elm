@@ -17,6 +17,22 @@ main =
         }
 
 
+red =
+    rgb 1 0 0
+
+
+blue =
+    rgb 0 0 1
+
+
+green =
+    rgb 0 1 0
+
+
+findWith col =
+    Background.color col
+
+
 type alias Model =
     { hour1 : String
     , minute1 : String
@@ -162,7 +178,14 @@ timeEntry model =
                             | time1 = modification
                         }
             , label =
-                Element.el [] <|
+                Element.el
+                    [ width fill
+                    , height fill
+                    , moveUp 10
+
+                    -- , padding 50
+                    ]
+                <|
                     text <|
                         iif ( model.time1.amPm == Am, "AM", "PM" )
             }
