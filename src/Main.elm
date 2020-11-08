@@ -100,7 +100,12 @@ timeTextBox time hourOrMinute =
         { text = val
         , placeholder = Just (Input.placeholder [] (text placeholder))
         , onChange = go time hourOrMinute
-        , label = Input.labelAbove [ Font.size 14 ] (text label)
+        , label =
+            Input.labelAbove
+                [ Font.size 14
+                , Font.bold
+                ]
+                (text label)
         }
 
 
@@ -155,7 +160,12 @@ timeEntry model =
         myTime =
             model.time1
     in
-    Element.row [ spacing 10 ]
+    Element.row
+        [ spacing 10
+        , padding 20
+        , Border.rounded 10
+        , Background.color <| rgb 0.3 0.3 0.3
+        ]
         [ timeTextBox model.time1 Hour
         , timeTextBox model.time1 Minute
         , Input.button
