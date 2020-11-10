@@ -43,8 +43,8 @@ timeEntry model =
         -- , Border.innerGlow red 4
         , Background.color <| grey 0.3
         ]
-        [ timeTextBox model.time1 Hour
-        , timeTextBox model.time1 Minute
+        [ hourTextBox model.time1
+        , minuteTextBox model.time1
         , Input.button
             [ alignBottom
             , height <| px 20
@@ -79,15 +79,10 @@ timeEntry model =
         ]
 
 
-timeTextBox time hourOrMinute =
+hourTextBox time =
     let
         labels =
-            case hourOrMinute of
-                Hour ->
-                    ( "Hour", "1-12", time.hour )
-
-                Minute ->
-                    ( "Minute", "0-60", time.minute )
+            ( "Hour", "1-12", time.hour )
 
         ( label, placeholder, val ) =
             labels
@@ -105,7 +100,38 @@ timeTextBox time hourOrMinute =
                     ]
                     (text placeholder)
                 )
-        , onChange = updateTime time hourOrMinute
+        , onChange = updateTime time Hour
+        , label =
+            Input.labelAbove
+                [ Font.size 14
+                , Font.bold
+                ]
+                (text label)
+        }
+
+
+minuteTextBox time =
+    let
+        labels =
+            ( "Minute", "0-60", time.minute )
+
+        ( label, placeholder, val ) =
+            labels
+    in
+    Input.text
+        [ width <| px 100
+        , Border.rounded 5
+        ]
+        { text = val
+        , placeholder =
+            Just
+                (Input.placeholder
+                    [ Background.color <| grey 0.05
+                    , Border.rounded 5
+                    ]
+                    (text placeholder)
+                )
+        , onChange = updateTime time Minute
         , label =
             Input.labelAbove
                 [ Font.size 14
